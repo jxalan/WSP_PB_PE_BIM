@@ -1,0 +1,5 @@
+name: WSP PB PE BIM
+author: WSP Peru + Jorge Salvador
+type: extension
+description: "Herramientas internas BIM para WSP Peru (QA/QC, modelado, documentación, coordinación)."
+version: "0.1.0"

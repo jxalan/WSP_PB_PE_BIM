@@ -1,0 +1,4 @@
+name: QA / QC
+tooltip: "Controles de calidad del modelo"
+layout:
+  - Structural QC
