@@ -1,0 +1,54 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+[Bb]in/
+[Oo]bj/
+
+# Build results
+[Dd]ebug*/
+[Rr]elease*/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+.venv/
+env/
+venv/
+
+# pyRevit
+pyrevit_debug.log
+pyrevit_state.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Images / binaries
+*.png
+*.jpg
+*.jpeg
+*.ico
+
+# Logs
+*.log
+
+# JetBrains
+.idea/
+
+# Node
+node_modules/
+
+# Coverage
+.coverage
+coverage.xml
+
+# Others
+*.tmp
+*.bak
+*.swp

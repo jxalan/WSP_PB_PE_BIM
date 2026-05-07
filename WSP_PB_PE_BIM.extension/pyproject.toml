@@ -1,0 +1,16 @@
+[project]
+name = "wsp_pb_pe_bim"
+version = "0.1.0"
+description = "pyRevit extension: WSP Peru BIM tools"
+authors = ["WSP Peru <bim@wsp.pe>"]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+
+[tool.pytest]
+minversion = "6.0"
+addopts = "-ra -q"
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
