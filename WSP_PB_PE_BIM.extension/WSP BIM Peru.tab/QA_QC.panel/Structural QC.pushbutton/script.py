@@ -10,50 +10,61 @@ Motor: CPython 3 (hashbang) [2](https://docs.pyrevitlabs.io/reference/pyrevit/ex
 from __future__ import annotations
 
 from collections import defaultdict
+from typing import Any
 
-from pyrevit import DB, UI
-from pyrevit import script, revit
-
-# Intento "RevitServices" (si existe en tu entorno). En pyRevit puro normalmente NO es necesario.
+# Local imports from lib (these modules are kept free of side-effects)
+# These are resolved at runtime within pyRevit; IDE path resolution may warn here.
 try:
-    from RevitServices.Persistence import DocumentManager  # type: ignore
-    DOC = DocumentManager.Instance.CurrentDBDocument
-except Exception:
-    DOC = revit.doc  # pyRevit wrapper estándar
+    from wsp_utils import (  # type: ignore[import]
+        get_structural_walls,
+        get_structural_columns,
+        is_text_param_not_empty,
+        is_level_assigned,
+        build_issue,
+    )
+
+    from wpf_dialog import show_structuralqc_dialog  # type: ignore[import]
+except ImportError:
+    # IDE import check; modules available at runtime in pyRevit
+    get_structural_walls = None  # type: ignore[assignment]
+    get_structural_columns = None  # type: ignore[assignment]
+    is_text_param_not_empty = None  # type: ignore[assignment]
+    is_level_assigned = None  # type: ignore[assignment]
+    build_issue = None  # type: ignore[assignment]
+    show_structuralqc_dialog = None  # type: ignore[assignment]
 
 
-# Import local (lib)
-# En pyRevit, la carpeta /lib de la extensión es un lugar típico para módulos compartidos. [4](https://pyrevitlabs.notion.site/pyRevit-Bundles-12323e3090904d9aa7cdc3d82095d3e3)
-from wsp_utils import (
-    get_structural_walls,
-    get_structural_columns,
-    is_text_param_not_empty,
-    is_level_assigned,
-    build_issue,
-)
-
-from wpf_dialog import show_structuralqc_dialog
-
-
-OUTPUT = script.get_output()
-
-
-def _describe_elem(elem: DB.Element) -> str:
+def _describe_elem(elem: Any) -> str:
     cat = elem.Category.Name if elem.Category else "N/A"
     name = getattr(elem, "Name", "") or ""
     return "{} | {} | {}".format(elem.Id.IntegerValue, cat, name)
 
 
-def run():
-    doc = DOC
+def run() -> None:
+    # Import pyRevit/Revit wrappers lazily to avoid side-effects at module import
+    # These are only available at runtime within pyRevit/Revit environment
+    try:
+        from pyrevit import DB, UI, script, revit  # type: ignore[import]
+    except Exception as exc:  # pragma: no cover - runtime environment
+        raise RuntimeError("pyRevit environment not available: {}".format(exc))
+
+    # Try DocumentManager if available (Dynamo/other hosts), otherwise use revit.doc
+    try:
+        from RevitServices.Persistence import DocumentManager  # type: ignore
+        doc = DocumentManager.Instance.CurrentDBDocument
+    except Exception:
+        doc = revit.doc
+
     if not doc:
         UI.TaskDialog.Show("Structural QC", "No hay documento activo.")
-        return
+        return None
+
+    OUTPUT = script.get_output()
 
     cfg = show_structuralqc_dialog()
     if cfg is None:
         # Cancelado
-        return
+        return None
 
     # 1) Recojo elementos según selección
     elements = []
@@ -104,19 +115,28 @@ def run():
 
     # 4) TaskDialog resumen
     msg = (
-        "Resumen Structural QC\n\n"
-        "Elementos revisados: {total}\n"
-        "Fallas por Comments: {fc}\n"
-        "Fallas por Level: {fl}\n"
-        "Incidencias totales: {ti}\n"
-    ).format(
-        total=len(elements),
-        fc=counters["fail_comments"],
-        fl=counters["fail_level"],
-        ti=len(issues),
+        f"Resumen Structural QC\n\n"
+        f"Elementos revisados: {len(elements)}\n"
+        f"Fallas por Comments: {counters['fail_comments']}\n"
+        f"Fallas por Level: {counters['fail_level']}\n"
+        f"Incidencias totales: {len(issues)}\n"
     )
     UI.TaskDialog.Show("Structural QC – WSP BIM Peru", msg)
+    return None
 
 
 if __name__ == "__main__":
-    run()
+    try:
+        run()
+    except Exception as exc:  # pragma: no cover - runtime error reporting
+        # Try to show a friendly dialog/console output when running inside pyRevit
+        try:
+            from pyrevit import script, UI  # type: ignore[import]
+
+            OUT = script.get_output()
+            OUT.print_md("**Structural QC - Error:** {}".format(exc))
+            UI.TaskDialog.Show("Structural QC - Error", str(exc))
+        except Exception:
+            # Fallback to printing
+            print("Structural QC - Error:", exc)
+        raise

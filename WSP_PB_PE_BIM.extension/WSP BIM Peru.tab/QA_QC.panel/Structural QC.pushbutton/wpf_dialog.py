@@ -12,16 +12,29 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from typing import Optional
 
-import clr  # pythonnet (CPython) dentro de pyRevit
+# These are available only at runtime within pyRevit environment
+# IDE linting will warn; use type: ignore comments to suppress
+try:
+    import clr  # type: ignore[import] - pythonnet (CPython) inside pyRevit
 
-clr.AddReference("PresentationFramework")
-clr.AddReference("PresentationCore")
-clr.AddReference("WindowsBase")
+    clr.AddReference("PresentationFramework")
+    clr.AddReference("PresentationCore")
+    clr.AddReference("WindowsBase")
 
-from System.IO import File, FileAccess, FileMode, FileShare
-from System.Windows import Window
-from System.Windows.Markup import XamlReader
+    from System.IO import File, FileAccess, FileMode, FileShare  # type: ignore[import]
+    from System.Windows import Window  # type: ignore[import]
+    from System.Windows.Markup import XamlReader  # type: ignore[import]
+except ImportError:
+    # IDE import check; modules available at runtime in pyRevit
+    clr = None  # type: ignore[assignment]
+    File = None  # type: ignore[assignment]
+    FileAccess = None  # type: ignore[assignment]
+    FileMode = None  # type: ignore[assignment]
+    FileShare = None  # type: ignore[assignment]
+    Window = None  # type: ignore[assignment]
+    XamlReader = None  # type: ignore[assignment]
 
 
 @dataclass(frozen=True)
@@ -46,7 +59,7 @@ def _load_window_from_xaml(xaml_path: str) -> Window:
     return win
 
 
-def show_structuralqc_dialog() -> StructuralQCConfig | None:
+def show_structuralqc_dialog() -> Optional[StructuralQCConfig]:
     """
     Muestra el diálogo modal y retorna configuración seleccionada.
     Retorna None si el usuario cancela/cierra.
@@ -64,8 +77,9 @@ def show_structuralqc_dialog() -> StructuralQCConfig | None:
     btn_run = win.FindName("btnRun")
     btn_cancel = win.FindName("btnCancel")
 
-    # Estado interno
-    result = {"ok": False, "config": None}
+    # Estado interno para capturar resultado
+    result_config: Optional[StructuralQCConfig] = None
+    user_confirmed = False
 
     def _is_checked(chk) -> bool:
         # IsChecked es Nullable[bool] en WPF
@@ -74,21 +88,22 @@ def show_structuralqc_dialog() -> StructuralQCConfig | None:
         except Exception:
             return False
 
-    def on_run(sender, args):
-        cfg = StructuralQCConfig(
+    def on_run(sender, args) -> None:
+        nonlocal result_config, user_confirmed
+        result_config = StructuralQCConfig(
             check_walls=_is_checked(chk_walls),
             check_columns=_is_checked(chk_cols),
             check_comments=_is_checked(chk_comm),
             check_level=_is_checked(chk_lvl),
         )
-        result["ok"] = True
-        result["config"] = cfg
+        user_confirmed = True
         win.DialogResult = True  # cierra modal
         win.Close()
 
-    def on_cancel(sender, args):
-        result["ok"] = False
-        result["config"] = None
+    def on_cancel(sender, args) -> None:
+        nonlocal result_config, user_confirmed
+        result_config = None
+        user_confirmed = False
         win.DialogResult = False
         win.Close()
 
@@ -101,4 +116,4 @@ def show_structuralqc_dialog() -> StructuralQCConfig | None:
     # Mostrar modal
     win.ShowDialog()
 
-    return result["config"] if result["ok"] else None
+    return result_config if user_confirmed else None

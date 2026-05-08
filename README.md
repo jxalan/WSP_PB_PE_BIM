@@ -1,6 +1,6 @@
 # WSP_PB_PE_BIM – pyRevit Extension
 
-Extensión corporativa pyRevit para **WSP Perú**, orientada a herramientas BIM internas de **QA/QC, modelado, documentación y coordinación** en Revit.
+Extensión corporativa pyRevit para **WSP Perú**, con herramientas BIM internas de **QA/QC, modelado, documentación y coordinación** en Revit.
 
 ---
 
@@ -8,7 +8,7 @@ Extensión corporativa pyRevit para **WSP Perú**, orientada a herramientas BIM 
 
 - Autodesk Revit **2024 / 2025 / 2026** (inglés)
 - **pyRevit ≥ 6.1.x** instalado y adjunto a Revit
-- Git y Visual Studio (recomendado, no obligatorio)
+- Git y Visual Studio o VS Code (recomendado)
 
 ---
 
@@ -17,101 +17,154 @@ Extensión corporativa pyRevit para **WSP Perú**, orientada a herramientas BIM 
 Instalar la extensión directamente desde GitHub:
 
 ```sh
-pyrevit extend extension https://github.com/TU_USUARIO/WSP_PB_PE_BIM.git WSP_PB_PE_BIM
+pyrevit extend extension https://github.com/jxalan/WSP_PB_PE_BIM.git WSP_PB_PE_BIM
 ```
 
 Reinicia Revit después de la instalación.
 
-🔄 Actualización
+### 🔄 Actualización
+
 Para traer la última versión del repositorio:
 
 ```sh
 pyrevit extensions update WSP_PB_PE_BIM
 ```
 
-🧭 Ubicación en Revit
+### 🧭 Ubicación en Revit
+
 En el Ribbon aparecerá:
-Tab: WSP BIM Peru
-Panels:
+- **Tab:** WSP BIM Peru
+- **Panels:**
+  - QA / QC
+  - Modeling
+  - Docs
+  - Coordination
 
-- QA / QC
-- Modelado
-- Documentación
-- Coordinación
 
+## 🧪 Herramientas Disponibles
 
-🧪 Primer comando disponible
-**Structural QC (QA / QC)**
-Herramienta de revisión rápida para elementos estructurales:
+### Structural QC (QA / QC)
+Herramienta de revisión rápida para elementos estructurales.
 
-Tipos:
-
+**Elementos verificados:**
 - Muros estructurales
 - Columnas estructurales
 
-Checks:
+**Validaciones:**
+- Parámetro `Comments` no vacío
+- `Level` asignado correctamente
 
-- Parámetro Comments no vacío
-- Level asignado
+**Salida:**
+- Detalle clickable en consola pyRevit (IDs de elementos)
+- Resumen en diálogo con estadísticas
+- Información de elementos que no cumplen
 
-Los resultados se muestran:
-
-- En la consola de pyRevit (detalle)
-- En un resumen final (TaskDialog)
-
-
-🧱 Estructura base de la extensión
-
-WSP_PB_PE_BIM.extension/
-├─ lib/                    # Utilidades compartidas
-├─ WSP BIM Peru.tab/
-│  ├─ QA_QC.panel/
-│  │  └─ Structural QC.pushbutton/
-│  │     ├─ script.py
-│  │     └─ ui/StructuralQC_Dialog.xaml
-│  ├─ Modeling.panel/
-│  ├─ Docs.panel/
-│  └─ Coordination.panel/
-
-La estructura de carpetas define automáticamente Tabs, Panels y Buttons en Revit (convención pyRevit).
+**Próximas herramientas:**
+- QA/QC: Vigas, losas, muros arquitectónicos
+- Modeling: Validación de familias y parámetros
+- Docs: Exportación de vistas y planos
+- Coordination: Revisión interdisciplinaria
 
 
-🛠 Desarrollo (equipo BIM)
+## 🧱 Estructura del Proyecto
 
-- Motor Python: CPython 3 (#! python3)
-- UI: WPF (.xaml) cargado con XamlReader
-- No se requiere proyecto .NET ni compilación
+```
+WSP_PB_PE_BIM/
+├── README.md                                    # Documentación principal
+├── WSP_PB_PE_BIM.extension/
+│   ├── bundle.yaml                              # Manifiesto extensión
+│   ├── pyrightconfig.json                       # Configuración Pyright
+│   ├── pyproject.toml                           # Dependencias Python
+│   ├── CONFIGURACION_IDE.md                     # Guía IDE y troubleshooting
+│   ├── lib/
+│   │   └── wsp_utils.py                         # Utilidades compartidas
+│   ├── stubs/                                   # Type hints para módulos externos
+│   │   ├── pyrevit.pyi
+│   │   └── system.pyi
+│   └── WSP BIM Peru.tab/                        # Estructura pyRevit
+│       ├── QA_QC.panel/
+│       │   └── Structural QC.pushbutton/
+│       │       ├── script.py                    # Lógica principal
+│       │       ├── wpf_dialog.py                # UI WPF
+│       │       ├── bundle.yaml                  # Configuración botón
+│       │       └── ui/
+│       │           └── StructuralQC_Dialog.xaml # Diálogo WPF
+│       ├── Modeling.panel/
+│       ├── Docs.panel/
+│       └── Coordination.panel/
+```
 
-Se recomienda trabajar en Visual Studio – Open Folder.
+**Convención pyRevit:** La estructura de carpetas define automáticamente Tabs, Panels y Buttons en Revit.
 
 
-🤖 Uso de GitHub Copilot Pro
-Copilot Pro puede usarse para:
+## 🛠 Desarrollo (equipo BIM)
 
-- Refinar scripts pyRevit
-- Mejorar diálogos WPF (XAML)
-- Crear nuevas herramientas QA/QC
-- Documentar estándares WSP
+### Stack Técnico
+- **Python:** CPython 3.8+ (proporcionado por pyRevit)
+- **UI:** WPF con XAML (XamlReader + IronPython)
+- **API:** Revit API 2024+ (pyRevit wrapper)
+- **No requiere:** Proyecto .NET, compilación C#
 
-Copilot es apoyo, no reemplaza el criterio BIM / Revit API.
+### Setup IDE
+
+1. **Clonar repositorio:**
+   ```sh
+   git clone https://github.com/jxalan/WSP_PB_PE_BIM.git
+   cd WSP_PB_PE_BIM
+   ```
+
+2. **Abrir en Visual Studio / VS Code:**
+   - Visual Studio 2022+: `File → Open Folder`
+   - VS Code: Abrir carpeta del proyecto
+
+3. **Instalar en Revit (desarrollo):**
+   ```sh
+   pyrevit extend source --force "C:\Dev\WSP_PB_PE_BIM\WSP_PB_PE_BIM.extension"
+   ```
+   Esto vincula el repositorio local directamente a Revit.
+
+### Advertencias de IDE Esperadas
+
+Los módulos `pyrevit`, `clr`, y `System.*` solo existen **dentro de Revit en runtime**.
+- ⚠️ Pylance/Pyright en el IDE mostrará advertencias → **es normal**
+- ✅ El código funciona perfectamente en Revit
+
+**Solución:** Lee [CONFIGURACION_IDE.md](./WSP_PB_PE_BIM.extension/CONFIGURACION_IDE.md) para activar type stubs y desactivar warnings.
 
 
-📄 Licencia / Uso
-Extensión de uso interno WSP Perú.
-Distribución externa solo con autorización del equipo BIM.
+## 🤖 Uso de GitHub Copilot Pro
+
+Copilot es **apoyo para desarrollo**, no reemplaza criterio BIM/Revit API:
+
+- ✅ Refinar scripts pyRevit existentes
+- ✅ Mejorar diálogos WPF (XAML)
+- ✅ Crear nuevas herramientas QA/QC
+- ✅ Documentar estándares WSP
+- ❌ **Nunca** confiar ciegamente en sugerencias sin validar en Revit
+
+
+## 📄 Licencia y Distribución
+
+Extensión de uso interno **WSP Perú**.
+- ✅ Distribución interna dentro de WSP
+- ❌ Distribución externa solo con autorización del equipo BIM
 
 ---
 
-Contribuciones
---------------
+## 🤝 Contribuciones
 
-Este repositorio está pensado para uso interno. Para contribuciones internas:
+Este repositorio es **para desarrollo interno del equipo BIM**.
 
-- Forzar uso de branch feature/* y enviar Pull Requests a main.
-- Mantener la compatibilidad con Revit 2024-2026 y pyRevit 6.x.
-- Añadir tests para la lógica que no dependa de la API de Revit.
+**Estándares:**
+- Usar branches `feature/*` para nuevas herramientas
+- Enviar Pull Requests a `main` para review
+- Mantener compatibilidad: **Revit 2024-2026** + **pyRevit 6.x+**
+- Añadir tests para lógica no dependiente de API Revit
 
-Soporte
--------
+---
 
-Equipo BIM — bim@wsp.pe
+## 📞 Soporte
+
+**Equipo BIM:** bim@wsp.pe
+
+**Bugs / Requests:** Abrir issues en GitHub o contactar al equipo

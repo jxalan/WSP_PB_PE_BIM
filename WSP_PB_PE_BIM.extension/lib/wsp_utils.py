@@ -10,18 +10,33 @@ Principios:
 
 from __future__ import annotations
 
-from typing import List, Tuple, Dict, Optional
-
-from pyrevit import DB
+from typing import List, Tuple, Dict, Optional, Any
 
 
-def get_structural_walls(doc: DB.Document) -> List[DB.Element]:
+def _get_db_module():
+    """Lazily import Revit DB module.
+
+    Prefer Autodesk.Revit.DB to avoid pyRevit wrapper side-effects at import time.
+    """
+    try:
+        import Autodesk.Revit.DB as DB  # type: ignore
+        return DB
+    except Exception:
+        try:
+            from pyrevit import DB  # type: ignore
+            return DB
+        except Exception:
+            raise RuntimeError("Revit DB module not available. This function must run inside Revit or pyRevit.")
+
+
+def get_structural_walls(doc: Any) -> List[Any]:
     """
     Retorna muros marcados como estructurales.
     Estrategia:
       1) Filtra categoría OST_Walls
       2) Valida flag BuiltInParameter.WALL_STRUCTURAL_SIGNIFICANT (si existe)
     """
+    DB = _get_db_module()
     walls = (
         DB.FilteredElementCollector(doc)
         .OfCategory(DB.BuiltInCategory.OST_Walls)
@@ -42,8 +57,9 @@ def get_structural_walls(doc: DB.Document) -> List[DB.Element]:
     return structural_walls
 
 
-def get_structural_columns(doc: DB.Document) -> List[DB.Element]:
+def get_structural_columns(doc: Any) -> List[Any]:
     """Retorna columnas estructurales (Instances) por categoría OST_StructuralColumns."""
+    DB = _get_db_module()
     cols = (
         DB.FilteredElementCollector(doc)
         .OfCategory(DB.BuiltInCategory.OST_StructuralColumns)
@@ -53,7 +69,8 @@ def get_structural_columns(doc: DB.Document) -> List[DB.Element]:
     return list(cols)
 
 
-def get_text_param_value(elem: DB.Element, param_name: str) -> Optional"""
+def get_text_param_value(elem: Any, param_name: str) -> Optional[str]:
+    """
     Lee un parámetro de texto por nombre (LookupParameter).
     Retorna string o None si no existe/no es string.
     """
@@ -66,7 +83,7 @@ def get_text_param_value(elem: DB.Element, param_name: str) -> Optional"""
         return None
 
 
-def is_text_param_not_empty(elem: DB.Element, param_name: str) -> bool:
+def is_text_param_not_empty(elem: Any, param_name: str) -> bool:  # type: ignore[name-defined]
     """True si el parámetro existe y su valor (trim) no está vacío."""
     val = get_text_param_value(elem, param_name)
     if val is None:
@@ -74,7 +91,7 @@ def is_text_param_not_empty(elem: DB.Element, param_name: str) -> bool:
     return bool(val.strip())
 
 
-def get_level_id(elem: DB.Element) -> Optional[DB.ElementId]:
+def get_level_id(elem: Any) -> Optional[Any]:
     """
     Intenta obtener el LevelId de manera robusta.
     - Primero: propiedad LevelId si existe
@@ -84,6 +101,7 @@ def get_level_id(elem: DB.Element) -> Optional[DB.ElementId]:
     if hasattr(elem, "LevelId"):
         try:
             lid = elem.LevelId
+            DB = _get_db_module()
             if lid and lid != DB.ElementId.InvalidElementId:
                 return lid
         except Exception:
@@ -91,6 +109,7 @@ def get_level_id(elem: DB.Element) -> Optional[DB.ElementId]:
 
     # 2) Fallback: parámetro LEVEL_PARAM
     try:
+        DB = _get_db_module()
         p = elem.get_Parameter(DB.BuiltInParameter.LEVEL_PARAM)
         if p:
             lid = p.AsElementId()
@@ -102,12 +121,12 @@ def get_level_id(elem: DB.Element) -> Optional[DB.ElementId]:
     return None
 
 
-def is_level_assigned(elem: DB.Element) -> bool:
+def is_level_assigned(elem: Any) -> bool:
     """True si el elemento tiene LevelId válido."""
     return get_level_id(elem) is not None
 
 
-def build_issue(elem: DB.Element, issue: str) -> Dict[str, str]:
+def build_issue(elem: Any, issue: str) -> Dict[str, str]:
     """
     Estructura estándar de hallazgo.
     """

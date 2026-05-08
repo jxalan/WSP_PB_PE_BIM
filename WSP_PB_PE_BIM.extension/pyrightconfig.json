@@ -1,0 +1,21 @@
+# pyright: basic
+
+[tool.pyright]
+# Pylance/Pyright configuration for WSP_PB_PE_BIM pyRevit extension
+# These modules are only available at runtime inside Revit/pyRevit, not in the IDE
+
+# Suppress missing import warnings for Revit/pyRevit/CLR modules
+reportMissingImports = false
+reportUndefinedVariable = false
+
+# Python version target (pyRevit uses CPython 3.8+)
+pythonVersion = "3.8"
+
+# Exclude test temp files
+exclude = [".venv/**", "__pycache__/**", "*.pyc"]
+
+[tool.pylint]
+disable = [
+    "missing-docstring",
+    "too-few-public-methods",
+]
