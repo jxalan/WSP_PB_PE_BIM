@@ -34,11 +34,9 @@ pyrevit extensions update WSP_PB_PE_BIM
 
 En el Ribbon aparecerá:
 - **Tab:** WSP BIM Peru
-- **Panels:**
-  - QA / QC
-  - Modeling
-  - Docs
-  - Coordination
+- **Panel:** QA / QC
+  - Structural QC
+  - Tool1, Tool2 (próximas herramientas)
 
 
 ## 🧪 Herramientas Disponibles
@@ -57,13 +55,10 @@ Herramienta de revisión rápida para elementos estructurales.
 **Salida:**
 - Detalle clickable en consola pyRevit (IDs de elementos)
 - Resumen en diálogo con estadísticas
-- Información de elementos que no cumplen
 
-**Próximas herramientas:**
-- QA/QC: Vigas, losas, muros arquitectónicos
-- Modeling: Validación de familias y parámetros
-- Docs: Exportación de vistas y planos
-- Coordination: Revisión interdisciplinaria
+**Próximas herramientas en QA/QC:**
+- Tool1 (en desarrollo)
+- Tool2 (en desarrollo)
 
 
 ## 🧱 Estructura del Proyecto
@@ -71,30 +66,39 @@ Herramienta de revisión rápida para elementos estructurales.
 ```
 WSP_PB_PE_BIM/
 ├── README.md                                    # Documentación principal
-├── WSP_PB_PE_BIM.extension/
-│   ├── bundle.yaml                              # Manifiesto extensión
-│   ├── pyrightconfig.json                       # Configuración Pyright
-│   ├── pyproject.toml                           # Dependencias Python
-│   ├── CONFIGURACION_IDE.md                     # Guía IDE y troubleshooting
-│   ├── lib/
-│   │   └── wsp_utils.py                         # Utilidades compartidas
-│   ├── stubs/                                   # Type hints para módulos externos
-│   │   ├── pyrevit.pyi
-│   │   └── system.pyi
-│   └── WSP BIM Peru.tab/                        # Estructura pyRevit
-│       ├── QA_QC.panel/
-│       │   └── Structural QC.pushbutton/
-│       │       ├── script.py                    # Lógica principal
-│       │       ├── wpf_dialog.py                # UI WPF
-│       │       ├── bundle.yaml                  # Configuración botón
-│       │       └── ui/
-│       │           └── StructuralQC_Dialog.xaml # Diálogo WPF
-│       ├── Modeling.panel/
-│       ├── Docs.panel/
-│       └── Coordination.panel/
+├── .gitattributes / .gitignore                  # Configuración Git
+│
+└── WSP_PB_PE_BIM.extension/
+    ├── bundle.yaml                              # Manifiesto extensión
+    ├── pyrightconfig.json                       # Config IDE (Pyright)
+    ├── CONFIGURACION_IDE.md                     # Guía setup IDE
+    │
+    ├── lib/
+    │   └── wsp_utils.py                         # Utilidades compartidas
+    │
+    └── WSP BIM Peru.tab/
+        └── QA_QC.panel/
+            ├── bundle.yaml
+            ├── Structural QC.pushbutton/        # Herramienta 1 (funcional)
+            │   ├── script.py
+            │   ├── wpf_dialog.py
+            │   ├── bundle.yaml
+            │   └── ui/StructuralQC_Dialog.xaml
+            │
+            ├── Tool1.pushbutton/                # Template (en desarrollo)
+            │   ├── script.py
+            │   ├── wpf_dialog.py
+            │   ├── bundle.yaml
+            │   └── ui/
+            │
+            └── Tool2.pushbutton/                # Template (en desarrollo)
+                ├── script.py
+                ├── wpf_dialog.py
+                ├── bundle.yaml
+                └── ui/
 ```
 
-**Convención pyRevit:** La estructura de carpetas define automáticamente Tabs, Panels y Buttons en Revit.
+**Convención pyRevit:** Estructura de carpetas = Tabs, Panels, Buttons automáticamente.
 
 
 ## 🛠 Desarrollo (equipo BIM)

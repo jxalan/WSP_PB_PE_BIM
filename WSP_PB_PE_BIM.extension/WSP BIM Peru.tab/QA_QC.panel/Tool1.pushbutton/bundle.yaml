@@ -1,0 +1,24 @@
+title: "Structural QC"
+tooltip: "QA/QC estructural: revisa Comments y Level en muros/columnas según selección."
+author: "WSP Perú – BIM/Structures"
+help_url: "https://github.com/jxalan/WSP_PB_PE_BIM"
+
+description: >
+  Ejecuta revisiones rápidas de QA/QC sobre elementos estructurales:
+  - Muros estructurales
+  - Columnas estructurales
+  Checks:
+  - Comments no vacío
+  - Level asignado
+  Reporta incidencias por consola pyRevit y muestra un resumen.
+
+# Motor/ejecución:
+# - Para forzar CPython 3 lo canónico es iniciar script.py con '#! python3'. [2](https://docs.pyrevitlabs.io/reference/pyrevit/extensions/)
+# - Adicionalmente usamos 'engine.clean' para evitar estado residual entre ejecuciones.
+engine:
+  clean: true
+  # Requerimiento del solicitante (clave no estándar):
+  pyrevit_engine: "3"
+
+# Iconos (placeholders por ahora)
+# (pyRevit busca icon.png y opcional icon.dark.png en el folder del botón) [4](https://pyrevitlabs.notion.site/pyRevit-Bundles-12323e3090904d9aa7cdc3d82095d3e3)[2](https://docs.pyrevitlabs.io/reference/pyrevit/extensions/)

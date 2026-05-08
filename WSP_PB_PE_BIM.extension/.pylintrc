@@ -1,8 +1,0 @@
-# Configuration for IDE linting (VS Code / Pylance / Pyright)
-# These warnings are expected; pyRevit, CLR, and Revit API modules
-# are only available at RUNTIME inside Revit, not in the IDE.
-
-# Suppress reportMissingImports for pyRevit/Revit/CLR modules
-# See: pyrightconfig.json and .vscode/settings.json
-
-# For full context, read CONFIGURACION_IDE.md
